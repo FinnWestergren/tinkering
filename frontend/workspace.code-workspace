@@ -1,0 +1,14 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "elm.js": true,
+            "index.html": true,
+            "elm-stuff": true
+        }
+    }
+}
