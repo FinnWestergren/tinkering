@@ -6,9 +6,9 @@
     ],
     "settings": {
         "files.exclude": {
-            "elm.js": true,
-            "index.html": true,
-            "elm-stuff": true
+            "elm.js": false,
+            "index.html": false,
+            "elm-stuff": false
         }
     }
 }
