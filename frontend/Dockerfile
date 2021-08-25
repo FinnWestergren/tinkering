@@ -16,11 +16,10 @@ RUN sudo curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.1
 RUN sudo gunzip elm.gz
 RUN sudo chmod +x elm
 RUN sudo mv elm /usr/local/bin/
-
-COPY ./elm.json ./elm.json
-COPY ./src ./src
-
-RUN sudo elm make ./src/Main.elm --optimize --output=elm.js
 RUN sudo npm install http-server -g
+
+COPY . .
+
+RUN sudo elm make ./src/Main.elm --optimize --output=static/main.js
 
 CMD ["http-server"]

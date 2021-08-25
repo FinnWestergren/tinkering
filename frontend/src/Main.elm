@@ -45,7 +45,7 @@ update : Msg -> Model -> Model
 update msg model =
   case msg of
     Increment ->
-      model + 1212
+      model + 100
 
     Decrement ->
       model - 1
