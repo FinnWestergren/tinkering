@@ -1,0 +1,7 @@
+services:
+  frontend:
+    image: finnwestergren/tinker-town
+    ports:
+      - "8080:8080"
+    working_dir: /frontend
+    command: http-server 

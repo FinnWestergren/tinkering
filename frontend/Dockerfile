@@ -19,7 +19,6 @@ RUN sudo mv elm /usr/local/bin/
 RUN sudo npm install http-server -g
 
 COPY . .
-
 RUN sudo elm make ./src/Main.elm --optimize --output=static/main.js
 
 CMD ["http-server"]
