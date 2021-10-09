@@ -5,6 +5,10 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Url
+import Route
+
+type alias Flags =
+    {}
 
 -- MAIN
 
@@ -23,13 +27,12 @@ main =
 
 type alias Model =
   { key : Nav.Key
-  , url : Url.Url
+  , page : Route.Route
   }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
-  ( Model key url, Cmd.none )
+init flags url key = ({ key = key, page = Route.parseUrl url } , Cmd.none)
 
 -- UPDATE
 
@@ -49,9 +52,7 @@ update msg model =
           ( model, Nav.load href )
 
     UrlChanged url ->
-      ( { model | url = url }
-        , Cmd.none 
-      )
+      ( { model | page = Route.parseUrl url } , Cmd.none)
 
 -- SUBSCRIPTIONS
 
@@ -65,12 +66,17 @@ view : Model -> Browser.Document Msg
 view model =
   { title = "URL Interceptor"
   , body =
-      [ text "The current URL is: "
-      , b [] [ text (Url.toString model.url) ]
+      [ text "The current page is: "
+      , b [] [ text (Route.labelOf model.page) ]
       , ul []
-          [ viewLink "/create" ]
+          [ viewLink Route.EntryEditor
+          , viewLink Route.Main ]
       ]
   }
-viewLink : String -> Html msg
-viewLink path =
-  li [] [ a [ href path ] [ text path ] ]
+viewLink : Route.Route -> Html msg
+viewLink route =
+  let
+    label = Route.labelOf route
+    path = "/" ++ (Route.pathOf route)
+  in
+  li [] [ a [ href path ] [ text label ] ]

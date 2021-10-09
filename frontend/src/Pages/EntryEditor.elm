@@ -1,4 +1,4 @@
-module EntryCreate.CreationForm exposing (..)
+module Pages.EntryEditor exposing (..)
 
 import Browser
 import Html exposing (Html, button, div, text)
