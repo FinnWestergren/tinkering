@@ -5,7 +5,10 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Url
-import Route
+import Route exposing (Route)
+import Session exposing (Session)
+import Html.Events exposing (onClick)
+
 
 type alias Flags =
     {}
@@ -25,34 +28,63 @@ main =
 
 -- MODEL
 
-type alias Model =
-  { key : Nav.Key
-  , page : Route.Route
-  }
+type Model 
+  = Home Session
+  | EntryEditor Session
+  | NotFound Session 
+  
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key = ({ key = key, page = Route.parseUrl url } , Cmd.none)
+init _ url navKey = changeRouteTo (Route.parseUrl url) (Home (Session.toSession navKey))
+--({ key = navKey, page = Route.parseUrl url } , Cmd.none)
 
 -- UPDATE
 
 type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
+  | Log String
+
+changeRouteTo : Route -> Model -> ( Model, Cmd Msg )
+changeRouteTo route model =
+  let
+    session = toSession model
+    navKey = Session.navKey session
+  in
+  case route of
+    Route.NotFound -> ( NotFound session, Cmd.none )
+    Route.Home -> ( Home session, Route.pushUrl navKey route )
+    Route.EntryEditor -> Debug.log "test" ( EntryEditor session, Route.pushUrl navKey route)
+
+toSession : Model -> Session
+toSession page =
+    case page of
+        NotFound session ->
+            session
+        Home session ->
+            session
+        EntryEditor session ->
+            session
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    LinkClicked urlRequest ->
-      case urlRequest of
-        Browser.Internal url ->
-          ( model, Nav.pushUrl model.key (Url.toString url) )
+    case ( msg, model ) of
+        ( LinkClicked urlRequest, _ ) ->
+            case urlRequest of
+                Browser.Internal url ->
+                    changeRouteTo (Route.parseUrl url) model
+                Browser.External href ->
+                    ( model
+                    , Nav.load href
+                    )
 
-        Browser.External href ->
-          ( model, Nav.load href )
-
-    UrlChanged url ->
-      ( { model | page = Route.parseUrl url } , Cmd.none)
+        ( UrlChanged url, _ ) ->
+            changeRouteTo (Route.parseUrl url) model
+        ( _, _ ) ->
+            -- Disregard messages that arrived for the wrong page.
+            ( model, Cmd.none )
+      
 
 -- SUBSCRIPTIONS
 
@@ -67,16 +99,26 @@ view model =
   { title = "URL Interceptor"
   , body =
       [ text "The current page is: "
-      , b [] [ text (Route.labelOf model.page) ]
+      , b [] [ text (Route.labelOf (routeFromCurrentPage model)) ]
       , ul []
           [ viewLink Route.EntryEditor
-          , viewLink Route.Main ]
+          , viewLink Route.Home ]
+      , button [ onClick (Log "test")] [ text "click me"]
       ]
   }
-viewLink : Route.Route -> Html msg
-viewLink route =
+
+
+viewLink : Route.Route  -> Html msg
+viewLink route  =
   let
     label = Route.labelOf route
     path = "/" ++ (Route.pathOf route)
   in
-  li [] [ a [ href path ] [ text label ] ]
+   li [] [ a [ href path ] [ text label ] ]
+
+routeFromCurrentPage: Model -> Route.Route
+routeFromCurrentPage model =
+  case model of
+    NotFound _ -> Route.NotFound
+    EntryEditor _ -> Route.EntryEditor
+    Home _ -> Route.Home
