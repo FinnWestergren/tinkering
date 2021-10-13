@@ -30,7 +30,8 @@ pathOf : Route -> String
 pathOf route = 
   String.replace " " "" (labelOf route)
 
+
 pushUrl : Nav.Key -> Route -> Cmd msg
 pushUrl key route =
-    (Nav.pushUrl key (pathOf route))
+    Nav.pushUrl key (pathOf route)
  

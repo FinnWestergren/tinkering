@@ -50,12 +50,11 @@ changeRouteTo : Route -> Model -> ( Model, Cmd Msg )
 changeRouteTo route model =
   let
     session = toSession model
-    navKey = Session.navKey session
   in
-  case route of
+    case route of
     Route.NotFound -> ( NotFound session, Cmd.none )
-    Route.Home -> ( Home session, Route.pushUrl navKey route )
-    Route.EntryEditor -> Debug.log "test" ( EntryEditor session, Route.pushUrl navKey route)
+    Route.Home -> ( Home session, Cmd.none )
+    Route.EntryEditor -> ( EntryEditor session, Cmd.none)
 
 toSession : Model -> Session
 toSession page =
@@ -73,7 +72,10 @@ update msg model =
         ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    changeRouteTo (Route.parseUrl url) model
+                    let
+                      navKey = Session.navKey (toSession model)
+                    in
+                    ( model, Nav.pushUrl navKey (Url.toString url) )
                 Browser.External href ->
                     ( model
                     , Nav.load href
@@ -103,7 +105,6 @@ view model =
       , ul []
           [ viewLink Route.EntryEditor
           , viewLink Route.Home ]
-      , button [ onClick (Log "test")] [ text "click me"]
       ]
   }
 
