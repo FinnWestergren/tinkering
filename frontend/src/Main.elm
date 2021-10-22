@@ -8,6 +8,7 @@ import Url
 import Route exposing (Route)
 import Session exposing (Session)
 import Html.Events exposing (onClick)
+import Pages.Home as Homepage exposing (Model)
 
 
 type alias Flags =
@@ -29,7 +30,7 @@ main =
 -- MODEL
 
 type Model 
-  = Home Session
+  = Home Session Homepage.Model
   | EntryEditor Session
   | NotFound Session 
   
