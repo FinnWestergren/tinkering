@@ -1,4 +1,4 @@
-module Pages.Home exposing (Model, view, update)
+module Pages.Home exposing (..)
 import Html exposing (Html)
 import Html exposing (div)
 import Html.Events exposing (onClick)
