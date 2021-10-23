@@ -7,12 +7,15 @@ import Html exposing (text)
 import Html exposing (li)
 import Html exposing (ol)
 import List exposing (map)
+import Date exposing (Date)
+import Html exposing (span)
+import Date exposing (toIsoString)
 
 type alias Model = {
     posts: List Post
     }
 
-type alias Post = { title: String }
+type alias Post = { title: String, date: Date }
 
 -- UPDATE
 
@@ -24,9 +27,13 @@ update msg model = (model, Cmd.none)
 
 -- VIEW
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model = div []
     [ol [] (map renderPost model.posts) ] 
 
-renderPost : Post -> Html Msg
-renderPost post = li [] [text post.title]
+renderPost : Post -> Html msg
+renderPost post = 
+    li [] [
+        span [] [text post.title],
+        span [] [text (toIsoString post.date)]
+    ]

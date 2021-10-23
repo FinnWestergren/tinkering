@@ -22,9 +22,9 @@ parseUrl url = Maybe.withDefault NotFound (parse routeParser url)
 labelOf : Route -> String
 labelOf route = 
   case route of
-     Home -> "Home"
-     EntryEditor -> "Entry Editor"
-     _ -> "Not Found"
+    Home -> "Home"
+    EntryEditor -> "Entry Editor"
+    _ -> "Not Found"
 
 pathOf : Route -> String
 pathOf route = 
@@ -34,4 +34,3 @@ pathOf route =
 pushUrl : Nav.Key -> Route -> Cmd msg
 pushUrl key route =
     Nav.pushUrl key (pathOf route)
- 

@@ -9,6 +9,9 @@ import Route exposing (Route)
 import Session exposing (Session)
 import Html.Events exposing (onClick)
 import Pages.Home as Homepage exposing (Model)
+import Date exposing (fromCalendarDate)
+import Time exposing (Month(..), Weekday(..))
+
 
 
 type alias Flags =
@@ -34,10 +37,10 @@ type Model
   | EntryEditor Session
   | NotFound Session 
   
-
+testHomeModel = {posts = [{title = "test", date = fromCalendarDate 2020 Sep 26 }]}
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url navKey = changeRouteTo (Route.parseUrl url) (Home (Session.toSession navKey))
+init _ url navKey = changeRouteTo (Route.parseUrl url) (Home (Session.toSession navKey) testHomeModel)
 --({ key = navKey, page = Route.parseUrl url } , Cmd.none)
 
 -- UPDATE
@@ -54,7 +57,7 @@ changeRouteTo route model =
   in
     case route of
     Route.NotFound -> ( NotFound session, Cmd.none )
-    Route.Home -> ( Home session, Cmd.none )
+    Route.Home -> ( Home session testHomeModel , Cmd.none )
     Route.EntryEditor -> ( EntryEditor session, Cmd.none)
 
 toSession : Model -> Session
@@ -62,7 +65,7 @@ toSession page =
     case page of
         NotFound session ->
             session
-        Home session ->
+        Home session _ ->
             session
         EntryEditor session ->
             session
@@ -106,9 +109,9 @@ view model =
       , ul []
           [ viewLink Route.EntryEditor
           , viewLink Route.Home ]
+      , renderCurrentPage model
       ]
   }
-
 
 viewLink : Route.Route  -> Html msg
 viewLink route  =
@@ -116,11 +119,17 @@ viewLink route  =
     label = Route.labelOf route
     path = "/" ++ (Route.pathOf route)
   in
-   li [] [ a [ href path ] [ text label ] ]
+    li [] [ a [ href path ] [ text label ] ]
+
+renderCurrentPage: Model -> Html msg
+renderCurrentPage model = 
+  case model of
+    Home _ homeModel -> Homepage.view homeModel
+    _ -> div [] []
 
 routeFromCurrentPage: Model -> Route.Route
 routeFromCurrentPage model =
   case model of
     NotFound _ -> Route.NotFound
     EntryEditor _ -> Route.EntryEditor
-    Home _ -> Route.Home
+    Home _ _ -> Route.Home
