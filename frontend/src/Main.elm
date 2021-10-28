@@ -6,13 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Url
 import Route exposing (Route)
-import Session exposing (Session)
-import Html.Events exposing (onClick)
 import Pages.Home as Homepage exposing (Model)
-import Date exposing (fromCalendarDate)
-import Time exposing (Month(..), Weekday(..))
-
-
 
 type alias Flags =
     {}
@@ -32,16 +26,23 @@ main =
 
 -- MODEL
 
-type Model 
-  = Home Session Homepage.Model
-  | EntryEditor Session
-  | NotFound Session 
-  
-testHomeModel = {posts = [{title = "test", date = fromCalendarDate 2020 Sep 26 }]}
+type alias Model = {
+    page: Page,
+    navKey: Nav.Key }
+
+type Page
+  = Redirect
+  | Home Homepage.Model
+  | EntryEditor
+  | NotFound
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url navKey = changeRouteTo (Route.parseUrl url) (Home (Session.toSession navKey) testHomeModel)
---({ key = navKey, page = Route.parseUrl url } , Cmd.none)
+init _ url navKey = 
+    let 
+        defaultModel = { page = Redirect, navKey = navKey  }
+        (model, cmd) = changePageTo defaultModel (Route.parseUrl url)
+    in
+        (model, cmd)
 
 -- UPDATE
 
@@ -50,25 +51,12 @@ type Msg
   | UrlChanged Url.Url
   | Log String
 
-changeRouteTo : Route -> Model -> ( Model, Cmd Msg )
-changeRouteTo route model =
-  let
-    session = toSession model
-  in
+changePageTo : Model -> Route -> ( Model, Cmd Msg )
+changePageTo model route =
     case route of
-    Route.NotFound -> ( NotFound session, Cmd.none )
-    Route.Home -> ( Home session testHomeModel , Cmd.none )
-    Route.EntryEditor -> ( EntryEditor session, Cmd.none)
-
-toSession : Model -> Session
-toSession page =
-    case page of
-        NotFound session ->
-            session
-        Home session _ ->
-            session
-        EntryEditor session ->
-            session
+    Route.NotFound -> ( { model | page = NotFound }, Cmd.none )
+    Route.Home -> ({ model | page = Home (Homepage.LoadingPosts) } , Cmd.none )
+    Route.EntryEditor -> ( { model | page = EntryEditor }, Cmd.none)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -76,17 +64,11 @@ update msg model =
         ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
-                    let
-                      navKey = Session.navKey (toSession model)
-                    in
-                    ( model, Nav.pushUrl navKey (Url.toString url) )
+                    ( model, Nav.pushUrl model.navKey (Url.toString url) )
                 Browser.External href ->
-                    ( model
-                    , Nav.load href
-                    )
-
+                    ( model , Nav.load href )
         ( UrlChanged url, _ ) ->
-            changeRouteTo (Route.parseUrl url) model
+            changePageTo model (Route.parseUrl url)
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
             ( model, Cmd.none )
@@ -123,13 +105,13 @@ viewLink route  =
 
 renderCurrentPage: Model -> Html msg
 renderCurrentPage model = 
-  case model of
-    Home _ homeModel -> Homepage.view homeModel
+  case model.page of
+    Home homeModel -> Homepage.view homeModel
     _ -> div [] []
 
 routeFromCurrentPage: Model -> Route.Route
 routeFromCurrentPage model =
-  case model of
-    NotFound _ -> Route.NotFound
-    EntryEditor _ -> Route.EntryEditor
-    Home _ _ -> Route.Home
+  case model.page of
+    EntryEditor -> Route.EntryEditor
+    Home _ -> Route.Home
+    _ -> Route.NotFound
