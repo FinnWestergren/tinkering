@@ -2,8 +2,8 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (..)
 import Url
 import Route exposing (Route)
 import Pages.Home as Homepage exposing (Model)
@@ -94,18 +94,21 @@ subscriptions _ =
 
 -- VIEW
 
-view : Model -> Browser.Document Msg
+view : Model -> Browser.Document msg
 view model =
   { title = "URL Interceptor"
-  , body =
-      [ text "The current page is: "
-      , b [] [ text (Route.labelOf (routeFromCurrentPage model)) ]
-      , ul []
-          [ viewLink Route.EntryEditor
-          , viewLink Route.Home ]
-      , renderCurrentPage model
-      ]
+  , body = [toUnstyled (renderBody model)]
   }
+
+renderBody : Model -> Html msg
+renderBody model = 
+        div[] [
+            ul [] [ 
+                viewLink Route.EntryEditor, 
+                viewLink Route.Home 
+                ]
+            , renderCurrentPage model
+        ]
 
 viewLink : Route.Route  -> Html msg
 viewLink route  =

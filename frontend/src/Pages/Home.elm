@@ -1,11 +1,13 @@
 module Pages.Home exposing (..)
-import Html exposing (ol, Html, div, text, li, ol, span)
 import List exposing (map)
 import Date exposing (Date, toIsoString, fromCalendarDate)
 import Time exposing (Month(..))
 import Process
 import Task
 import Url exposing (Protocol(..))
+import Css exposing (..)
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (css)
 
 -- MODEL
 
@@ -44,19 +46,20 @@ update msg model =
 -- VIEW
 
 view : Model -> Html msg
-view model = div []
-    [renderPostsSection model]
+view model = div [] [
+        renderPostsSection model
+    ]
 
 renderPostsSection: Model -> Html msg
 renderPostsSection model =
     case model of
-        PostsLoaded posts -> ol [] (map renderPost posts)
+        PostsLoaded posts -> ol [] (List.map renderPost posts)
         LoadingPosts -> span [] [text "LoadingPosts"]
 
 renderPost : Post -> Html msg
 renderPost post = 
     li [] [
-        span [] [text post.title],
+        span [css [marginRight (px 10)]] [text post.title],
         span [] [text (toIsoString post.date)]
     ]
 
