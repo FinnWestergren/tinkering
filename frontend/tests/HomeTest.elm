@@ -30,11 +30,11 @@ suite =
                     title = "test"
                     date = fromCalendarDate 2020 Oct 26
                     post = {title = title, date = date}
-                    model = {posts = post |> repeat num}
+                    posts = post |> repeat num
                     multi = post |> Home.renderPost |> repeat num 
                     expected = div [] [ol [] multi]
                     
                 in
-                    Home.view model
+                    Home.view (Home.PostsLoaded posts)
                 |> Expect.equal expected
         ]

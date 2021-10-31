@@ -8,9 +8,6 @@ import Url
 import Route exposing (Route)
 import Pages.Home as Homepage exposing (Model)
 
-type alias Flags =
-    {}
-
 -- MAIN
 
 main : Program () Model Msg
@@ -49,29 +46,45 @@ init _ url navKey =
 type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
-  | Log String
+  | HomeMsg Homepage.Msg
+  | NoOp
+
 
 changePageTo : Model -> Route -> ( Model, Cmd Msg )
 changePageTo model route =
     case route of
     Route.NotFound -> ( { model | page = NotFound }, Cmd.none )
-    Route.Home -> ({ model | page = Home (Homepage.LoadingPosts) } , Cmd.none )
+    Route.Home -> 
+        let
+            (homeModel, homeCmd) = Homepage.init
+        in
+            ({ model | page = Home homeModel } , Cmd.map HomeMsg homeCmd )
     Route.EntryEditor -> ( { model | page = EntryEditor }, Cmd.none)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case ( msg, model ) of
-        ( LinkClicked urlRequest, _ ) ->
+update message model =
+    case ( message ) of
+        LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
                     ( model, Nav.pushUrl model.navKey (Url.toString url) )
                 Browser.External href ->
                     ( model , Nav.load href )
-        ( UrlChanged url, _ ) ->
+        UrlChanged url ->
             changePageTo model (Route.parseUrl url)
-        ( _, _ ) ->
+        HomeMsg msg -> 
+            case model.page of
+            Home homeModel -> stepHome model (Homepage.update msg homeModel)
+            _         -> ( model, Cmd.none )
+        _ ->
             -- Disregard messages that arrived for the wrong page.
             ( model, Cmd.none )
+
+stepHome : Model -> ( Homepage.Model, Cmd Homepage.Msg ) -> ( Model, Cmd Msg )
+stepHome model (homeModel, cmd) =
+  ( { model | page = Home homeModel }
+  , Cmd.map HomeMsg cmd
+  )
       
 
 -- SUBSCRIPTIONS

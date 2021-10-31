@@ -1,10 +1,11 @@
 module Pages.Home exposing (..)
 import Html exposing (ol, Html, div, text, li, ol, span)
 import List exposing (map)
-import Date exposing (Date)
-import Date exposing (toIsoString)
-import Date exposing (fromCalendarDate)
+import Date exposing (Date, toIsoString, fromCalendarDate)
 import Time exposing (Month(..))
+import Process
+import Task
+import Url exposing (Protocol(..))
 
 -- MODEL
 
@@ -15,7 +16,7 @@ type Model
 type alias Post = { title: String, date: Date }
 
 init: (Model, Cmd Msg)
-init = (LoadingPosts, Cmd.none) 
+init = (LoadingPosts, httpFetchPosts) 
 
 
 testHomeModel : List Post
@@ -31,10 +32,14 @@ testHomeModel =  [
 -- UPDATE
 
 type Msg = 
-    None
+    FetchPosts
+    | PostsRetrieved (List Post)
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update _ model = (model, Cmd.none)
+update msg model = 
+    case msg of
+        FetchPosts -> (LoadingPosts, httpFetchPosts)
+        PostsRetrieved list -> (PostsLoaded list, Cmd.none)
 
 -- VIEW
 
@@ -54,3 +59,14 @@ renderPost post =
         span [] [text post.title],
         span [] [text (toIsoString post.date)]
     ]
+
+-- HTTP
+
+httpFetchPosts: Cmd Msg
+httpFetchPosts =
+    let
+        task = Process.sleep 2000
+        msg = (PostsRetrieved testHomeModel)
+    in
+    task
+        |> Task.perform (\_ -> msg)
