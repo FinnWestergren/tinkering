@@ -76,10 +76,9 @@ update message model =
             case model.page of
             Home homeModel -> stepHome model (Homepage.update msg homeModel)
             _         -> ( model, Cmd.none )
-        _ ->
-            -- Disregard messages that arrived for the wrong page.
-            ( model, Cmd.none )
+        _ -> ( model, Cmd.none )
 
+-- calling this the "step" pattern because that is how the tutorials worked and it seems aight.
 stepHome : Model -> ( Homepage.Model, Cmd Homepage.Msg ) -> ( Model, Cmd Msg )
 stepHome model (homeModel, cmd) =
   ( { model | page = Home homeModel }
