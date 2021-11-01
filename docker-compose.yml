@@ -3,4 +3,4 @@ services:
     image: finnwestergren/tinker-town
     ports:
       - "8080:8080"
-    command: http-server ./ --port 8080
+    command: http-server ./ --port 8080 --proxy http://localhost:8080

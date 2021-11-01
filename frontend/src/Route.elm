@@ -1,29 +1,30 @@
 module Route exposing (..)
 
-import Url.Parser exposing (Parser, (</>), map, oneOf, s, parse)
+import Url.Parser exposing (Parser, (</>), map, oneOf, s, parse, top)
 import Browser.Navigation as Nav
 import Url exposing (Url)
 
 type Route
   = Home
-  | EntryEditor
+  | BlogPost
   | NotFound
 
 routeParser : Parser (Route -> a) a
 routeParser =
   oneOf
     [ map Home          (s (pathOf Home))
-    , map EntryEditor    (s (pathOf EntryEditor))
-    ]  
+    , map BlogPost    (s (pathOf BlogPost))
+    , map Home            top
+    ]
 
 parseUrl: Url -> Route
-parseUrl url = Maybe.withDefault NotFound (parse routeParser url)
+parseUrl url = Maybe.withDefault NotFound <| Debug.log "url" (parse routeParser url)
 
 labelOf : Route -> String
 labelOf route = 
   case route of
     Home -> "Home"
-    EntryEditor -> "Entry Editor"
+    BlogPost -> "Post"
     _ -> "Not Found"
 
 pathOf : Route -> String

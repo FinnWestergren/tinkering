@@ -20,17 +20,6 @@ type alias Post = { title: String, date: Date }
 init: (Model, Cmd Msg)
 init = (LoadingPosts, httpFetchPosts) 
 
-
-testHomeModel : List Post
-testHomeModel =  [
-        {title = "test_1", date = fromCalendarDate 2020 Jan 1 },
-        {title = "test_2", date = fromCalendarDate 2020 Feb 2 },
-        {title = "test_3", date = fromCalendarDate 2020 Mar 3 },
-        {title = "test_4", date = fromCalendarDate 2020 Apr 4 },
-        {title = "test_5", date = fromCalendarDate 2020 May 5 },
-        {title = "test_6", date = fromCalendarDate 2020 Jun 6 },
-        {title = "test_7", date = fromCalendarDate 2020 Jul 7 }]
-
 -- UPDATE
 
 type Msg = 
@@ -59,7 +48,7 @@ renderPostsSection model =
 renderPost : Post -> Html msg
 renderPost post = 
     li [] [
-        span [css [marginRight (px 10)]] [text post.title],
+        span [css [marginRight (px 40)]] [text post.title],
         span [] [text (toIsoString post.date)]
     ]
 
@@ -73,3 +62,13 @@ httpFetchPosts =
     in
     task
         |> Task.perform (\_ -> msg)
+
+testHomeModel : List Post
+testHomeModel =  [
+        {title = "test_1", date = fromCalendarDate 2021 Jan 1 },
+        {title = "test_2", date = fromCalendarDate 2020 Feb 2 },
+        {title = "test_3", date = fromCalendarDate 2020 Mar 3 },
+        {title = "test_4", date = fromCalendarDate 2020 Apr 4 },
+        {title = "test_5", date = fromCalendarDate 2020 May 5 },
+        {title = "test_6", date = fromCalendarDate 2020 Jun 6 },
+        {title = "test_7", date = fromCalendarDate 2020 Jul 7 }]

@@ -17,6 +17,7 @@ RUN sudo gunzip elm.gz
 RUN sudo chmod +x elm
 RUN sudo mv elm /usr/local/bin/
 RUN sudo npm install http-server -g
+RUN sudo npm install elm-live -g
 
 COPY . .
 RUN sudo elm make ./src/Main.elm --output=static/main.js

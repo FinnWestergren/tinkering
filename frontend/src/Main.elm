@@ -30,7 +30,7 @@ type alias Model = {
 type Page
   = Redirect
   | Home Homepage.Model
-  | EntryEditor
+  | BlogPost
   | NotFound
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -39,7 +39,7 @@ init _ url navKey =
         defaultModel = { page = Redirect, navKey = navKey  }
         (model, cmd) = changePageTo defaultModel (Route.parseUrl url)
     in
-        (model, cmd)
+        Debug.log "test" (model, cmd)
 
 -- UPDATE
 
@@ -59,7 +59,7 @@ changePageTo model route =
             (homeModel, homeCmd) = Homepage.init
         in
             ({ model | page = Home homeModel } , Cmd.map HomeMsg homeCmd )
-    Route.EntryEditor -> ( { model | page = EntryEditor }, Cmd.none)
+    Route.BlogPost -> ( { model | page = BlogPost }, Cmd.none)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
@@ -82,7 +82,7 @@ update message model =
 stepHome : Model -> ( Homepage.Model, Cmd Homepage.Msg ) -> ( Model, Cmd Msg )
 stepHome model (homeModel, cmd) =
   ( { model | page = Home homeModel }
-  , Cmd.map HomeMsg cmd
+  , Cmd.map HomeMsg cmd -- "This is very rarely useful in well-structured Elm code"
   )
       
 
@@ -104,7 +104,6 @@ renderBody : Model -> Html msg
 renderBody model = 
         div[] [
             ul [] [ 
-                viewLink Route.EntryEditor, 
                 viewLink Route.Home 
                 ]
             , renderCurrentPage model
@@ -127,6 +126,6 @@ renderCurrentPage model =
 routeFromCurrentPage: Model -> Route.Route
 routeFromCurrentPage model =
   case model.page of
-    EntryEditor -> Route.EntryEditor
+    BlogPost -> Route.BlogPost
     Home _ -> Route.Home
     _ -> Route.NotFound
