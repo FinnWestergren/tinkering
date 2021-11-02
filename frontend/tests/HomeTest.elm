@@ -8,6 +8,10 @@ import Html.Styled exposing (..)
 import Date exposing (Date, Interval(..), Unit(..), toIsoString, fromCalendarDate)
 import Time exposing (Month(..), Weekday(..))
 import List exposing (repeat)
+import Html.Styled.Attributes exposing (href)
+import Html.Styled.Attributes exposing (css)
+import Css exposing (marginRight)
+import Css exposing (px)
 
 suite : Test
 suite =
@@ -17,19 +21,20 @@ suite =
                 let
                     title = (String.fromInt num) ++ "test"
                     date = fromCalendarDate num Sep 26
-                    post = {title = title, date = date}
+                    id = String.fromInt (num * num)
+                    post = {title = title, date = date, id = id}
                     expected = li [] [
-                        span [] [text title],
+                        a [css [marginRight (px 40)], href ("Post/" ++ id)] [text title],
                         span [] [text (toIsoString date)]]
                 in
-                    Home.renderPost post
+                Home.renderPost post
                 |> Expect.equal expected,
             fuzz (intRange 1 20) "renders multiple posts" <|
             \num -> 
                 let
                     title = "test"
                     date = fromCalendarDate 2020 Oct 26
-                    post = {title = title, date = date}
+                    post = {title = title, date = date, id = String.fromInt (num * num)}
                     posts = post |> repeat num
                     multi = post |> Home.renderPost |> repeat num 
                     expected = div [] [ol [] multi]

@@ -30,7 +30,7 @@ type alias Model = {
 type Page
   = Redirect
   | Home Homepage.Model
-  | BlogPost
+  | BlogPost String
   | NotFound
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -39,7 +39,7 @@ init _ url navKey =
         defaultModel = { page = Redirect, navKey = navKey  }
         (model, cmd) = changePageTo defaultModel (Route.parseUrl url)
     in
-        Debug.log "test" (model, cmd)
+        (model, cmd)
 
 -- UPDATE
 
@@ -59,7 +59,7 @@ changePageTo model route =
             (homeModel, homeCmd) = Homepage.init
         in
             ({ model | page = Home homeModel } , Cmd.map HomeMsg homeCmd )
-    Route.BlogPost -> ( { model | page = BlogPost }, Cmd.none)
+    Route.BlogPost id -> ( { model | page = BlogPost id }, Cmd.none)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
@@ -126,6 +126,6 @@ renderCurrentPage model =
 routeFromCurrentPage: Model -> Route.Route
 routeFromCurrentPage model =
   case model.page of
-    BlogPost -> Route.BlogPost
+    BlogPost id -> Route.BlogPost id
     Home _ -> Route.Home
     _ -> Route.NotFound
