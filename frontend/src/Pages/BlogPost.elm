@@ -46,7 +46,7 @@ renderPostsSection model =
 renderPost : Post -> Html msg
 renderPost post = 
     div [] [
-        a [css [marginRight (px 40)]] [text post.title] ,
+        span [css [marginRight (px 40)]] [text post.title] ,
         span [css [marginRight (px 40)]] [text (toIsoString post.date)],
         span [] [text post.id]
     ]

@@ -1,4 +1,4 @@
-module Pages.Home exposing (Model, init, update, view, Msg)
+module Pages.Home exposing (init, update, view, Msg, renderPost, Model(..))
 import List
 import Date exposing (Date, toIsoString, fromCalendarDate)
 import Time exposing (Month(..))
