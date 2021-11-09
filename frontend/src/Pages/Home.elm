@@ -1,4 +1,4 @@
-module Pages.Home exposing (..)
+module Pages.Home exposing (Model, init, update, view, Msg)
 import List
 import Date exposing (Date, toIsoString, fromCalendarDate)
 import Time exposing (Month(..))
@@ -62,7 +62,7 @@ renderPost post =
 httpFetchPosts: Cmd Msg
 httpFetchPosts =
     let
-        task = Process.sleep 2000
+        task = Process.sleep 100
         msg = (PostsRetrieved testHomeModel)
     in
     task

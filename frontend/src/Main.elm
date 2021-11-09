@@ -7,6 +7,7 @@ import Html.Styled.Attributes exposing (..)
 import Url
 import Route exposing (Route)
 import Pages.Home as Homepage exposing (Model)
+import Pages.BlogPost as BlogPost exposing (Model)
 
 -- MAIN
 
@@ -30,7 +31,7 @@ type alias Model = {
 type Page
   = Redirect
   | Home Homepage.Model
-  | BlogPost String
+  | BlogPost String BlogPost.Model 
   | NotFound
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -47,6 +48,7 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | HomeMsg Homepage.Msg
+  | BlogPostMsg BlogPost.Msg
   | NoOp
 
 
@@ -59,7 +61,11 @@ changePageTo model route =
             (homeModel, homeCmd) = Homepage.init
         in
             ({ model | page = Home homeModel } , Cmd.map HomeMsg homeCmd )
-    Route.BlogPost id -> ( { model | page = BlogPost id }, Cmd.none)
+    Route.BlogPost id -> 
+        let
+            (postModel, postCmd) = BlogPost.init id
+        in
+            ({ model | page = BlogPost id postModel } , Cmd.map BlogPostMsg postCmd )
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
@@ -76,6 +82,10 @@ update message model =
             case model.page of
             Home homeModel -> stepHome model (Homepage.update msg homeModel)
             _         -> ( model, Cmd.none )
+        BlogPostMsg msg -> 
+            case model.page of
+            BlogPost id postModel -> stepPost id model (BlogPost.update msg postModel)
+            _         -> ( model, Cmd.none )
         _ -> ( model, Cmd.none )
 
 -- calling this the "step" pattern because that is how the tutorials worked and it seems aight.
@@ -83,6 +93,12 @@ stepHome : Model -> ( Homepage.Model, Cmd Homepage.Msg ) -> ( Model, Cmd Msg )
 stepHome model (homeModel, cmd) =
   ( { model | page = Home homeModel }
   , Cmd.map HomeMsg cmd -- "This is very rarely useful in well-structured Elm code"
+  )
+
+stepPost : String -> Model -> ( BlogPost.Model, Cmd BlogPost.Msg ) -> ( Model, Cmd Msg )
+stepPost id model (postModel, cmd) =
+  ( { model | page = BlogPost id postModel }
+  , Cmd.map BlogPostMsg cmd -- "This is very rarely useful in well-structured Elm code"
   )
       
 
@@ -121,11 +137,12 @@ renderCurrentPage: Model -> Html msg
 renderCurrentPage model = 
   case model.page of
     Home homeModel -> Homepage.view homeModel
+    BlogPost _ postModel -> BlogPost.view postModel
     _ -> div [] []
 
 routeFromCurrentPage: Model -> Route.Route
 routeFromCurrentPage model =
   case model.page of
-    BlogPost id -> Route.BlogPost id
+    BlogPost id _ -> Route.BlogPost id
     Home _ -> Route.Home
     _ -> Route.NotFound

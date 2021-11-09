@@ -1,11 +1,11 @@
 module HomeTest exposing (suite)
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, intRange)
+import Expect
+import Fuzz exposing (intRange)
 import Test exposing (..)
-import Pages.Home as Home exposing (Model, renderPost)
+import Pages.Home as Home
 import Html.Styled exposing (..)
-import Date exposing (Date, Interval(..), Unit(..), toIsoString, fromCalendarDate)
+import Date exposing (Interval(..), Unit(..), toIsoString, fromCalendarDate)
 import Time exposing (Month(..), Weekday(..))
 import List exposing (repeat)
 import Html.Styled.Attributes exposing (href)
