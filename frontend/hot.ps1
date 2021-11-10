@@ -1,1 +1,1 @@
-elm-live src/Main.elm --pushstate
+elm-live ./src/Main.elm --pushstate -- -- --output=static/main.js

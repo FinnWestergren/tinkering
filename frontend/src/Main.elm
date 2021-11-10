@@ -11,7 +11,7 @@ import Pages.BlogPost as BlogPost exposing (Model)
 
 -- MAIN
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
   Browser.application
     { init = init
@@ -26,7 +26,8 @@ main =
 
 type alias Model = {
     page: Page,
-    navKey: Nav.Key }
+    navKey: Nav.Key,
+    config: Flags }
 
 type Page
   = Redirect
@@ -34,10 +35,12 @@ type Page
   | BlogPost String BlogPost.Model 
   | NotFound
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url navKey = 
+type alias Flags = { serverAddress: String }
+
+init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url navKey = 
     let 
-        defaultModel = { page = Redirect, navKey = navKey  }
+        defaultModel = { page = Redirect, navKey = navKey, config = Debug.log "test2" flags }
         (model, cmd) = changePageTo defaultModel (Route.parseUrl url)
     in
         (model, cmd)
@@ -112,7 +115,7 @@ subscriptions _ =
 
 view : Model -> Browser.Document msg
 view model =
-  { title = "URL Interceptor"
+  { title = "Fuck my ass"
   , body = [toUnstyled (renderBody model)]
   }
 

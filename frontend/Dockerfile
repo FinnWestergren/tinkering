@@ -22,4 +22,4 @@ RUN sudo npm install elm-live -g
 COPY . .
 RUN sudo elm make ./src/Main.elm --output=static/main.js
 
-CMD ["http-server --port 8080"]
+CMD ["http-server --port 8080 --proxy http://localhost:8080?"]
