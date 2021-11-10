@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="https://f4.bcbits.com/img/a2332018473_3.jpg">
+  </head>
+
+  <body>
+    <div id="elm"></div>    
+    <script src="/static/main.js"></script>
+    <script>
+      var app = Elm.Main.init({
+        node: document.getElementById("elm"),
+        flags: {serverAddress: "test"}
+      });      
+    </script>
+  </body>
+</html>

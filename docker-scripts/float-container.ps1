@@ -1,0 +1,1 @@
+docker container run -p 9000:9000 -it finnwestergren/tinker-town /bin/bash
