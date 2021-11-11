@@ -5,30 +5,36 @@ import Html.Styled.Attributes exposing (css)
 import Css exposing (marginRight)
 import Css exposing (px)
 import Date exposing (toIsoString)
-import Process
-import Task
 import Date exposing (fromCalendarDate)
 import Time exposing (Month(..))
+import Http
+import Json.Decode exposing (..)
+import Svg.Styled.Attributes exposing (result)
 
 -- MODEL
 
 type Model 
     = Loading
     | Loaded Post
+    | Failure
 
-type alias Post = { title: String, date: Date, id: String }
+type alias Post = { title: String, date: String, id: String }
 
 init: String -> (Model, Cmd Msg)
 init postId = (Loading, httpFetchPost postId) 
 
 -- UPDATE
 
-type Msg = PostRetrieved Post
+type Msg = 
+    PostRetrieved (Result Http.Error (Post))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg _ = 
     case msg of
-        PostRetrieved post -> (Loaded post, Cmd.none)
+        PostRetrieved result ->
+            case result of
+                Ok post -> (Loaded post, Cmd.none)
+                _ -> (Failure, Cmd.none)
 
 -- VIEW
 
@@ -42,12 +48,13 @@ renderPostsSection model =
     case model of
         Loaded post -> renderPost post
         Loading -> span [] [text "Loading"]
+        Failure -> span [] [text "Error"]
 
 renderPost : Post -> Html msg
 renderPost post = 
     div [] [
         span [css [marginRight (px 40)]] [text post.title] ,
-        span [css [marginRight (px 40)]] [text (toIsoString post.date)],
+        span [css [marginRight (px 40)]] [text post.date],
         span [] [text post.id]
     ]
 
@@ -55,12 +62,17 @@ renderPost post =
 
 httpFetchPost : String -> Cmd Msg
 httpFetchPost id =
-    let
-        task = Process.sleep 100
-        msg = PostRetrieved (testPostModel id)
-    in
-    task
-        |> Task.perform (\_ -> msg)
+    Http.get
+    { url = Debug.log "test" ("http://localhost:3000/" ++ id)
+    , expect = Http.expectJson PostRetrieved postDecoder
+    }
+
+postDecoder : Decoder Post
+postDecoder = 
+    map3 Post
+    (field "title" string)
+    (field "date" string)
+    (field "id" string)
 
 testPostModel : String -> Post
-testPostModel id = {title = "test_1", date = fromCalendarDate 2021 Jan 1, id = id}
+testPostModel id = {title = "test_1", date = "2021 Jan 1", id = id}

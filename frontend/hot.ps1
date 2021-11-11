@@ -1,1 +1,1 @@
-elm-live ./src/Main.elm --pushstate -- -- --output=static/main.js
+elm-live ./src/Main.elm --pushstate --cors -- -- --output=static/main.js
