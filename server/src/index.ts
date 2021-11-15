@@ -14,6 +14,7 @@ const route: (url: string) => string = (url) => {
         case "postlist":
             return JSON.stringify(Presentation.getPostList());
         case "post":
+        case "posts":
             return JSON.stringify(Presentation.getPost(urlSplit[2]));
         default:
             throw new NotFoundError(url);

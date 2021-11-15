@@ -59,7 +59,7 @@ renderPost post =
     div [css [marginLeft (px 20)]] [
         span [css [marginRight (px 40)]] [h3 [css [display inlineBlock]] [text post.title]] ,
         span [css [marginRight (px 40)]] [h4 [css [display inlineBlock]] [text post.date]],
-        div [] [text post.body]
+        pre [] [text post.body]
     ]
 
 -- HTTP
