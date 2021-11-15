@@ -10,6 +10,10 @@ import Time exposing (Month(..))
 import Http
 import Json.Decode exposing (..)
 import Svg.Styled.Attributes exposing (result)
+import Css exposing (marginTop)
+import Css exposing (marginLeft)
+import Css exposing (display)
+import Css exposing (inlineBlock)
 
 -- MODEL
 
@@ -18,7 +22,7 @@ type Model
     | Loaded Post
     | Failure
 
-type alias Post = { title: String, date: String, id: String }
+type alias Post = { title: String, date: String, body: String }
 
 init: String -> (Model, Cmd Msg)
 init postId = (Loading, httpFetchPost postId) 
@@ -52,10 +56,10 @@ renderPostsSection model =
 
 renderPost : Post -> Html msg
 renderPost post = 
-    div [] [
-        span [css [marginRight (px 40)]] [text post.title] ,
-        span [css [marginRight (px 40)]] [text post.date],
-        span [] [text post.id]
+    div [css [marginLeft (px 20)]] [
+        span [css [marginRight (px 40)]] [h3 [css [display inlineBlock]] [text post.title]] ,
+        span [css [marginRight (px 40)]] [h4 [css [display inlineBlock]] [text post.date]],
+        div [] [text post.body]
     ]
 
 -- HTTP
@@ -63,7 +67,7 @@ renderPost post =
 httpFetchPost : String -> Cmd Msg
 httpFetchPost id =
     Http.get
-    { url = Debug.log "test" ("http://localhost:3000/" ++ id)
+    { url = Debug.log "test" ("http://localhost:3000/Post/" ++ id)
     , expect = Http.expectJson PostRetrieved postDecoder
     }
 
@@ -72,7 +76,4 @@ postDecoder =
     map3 Post
     (field "title" string)
     (field "date" string)
-    (field "id" string)
-
-testPostModel : String -> Post
-testPostModel id = {title = "test_1", date = "2021 Jan 1", id = id}
+    (field "body" string)

@@ -10,14 +10,21 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
 import Html.Styled.Attributes exposing (href)
 import Route
+import Json.Decode exposing (Decoder)
+import Json.Decode exposing (map3)
+import Json.Decode exposing (list)
+import Http
+import Json.Decode exposing (field)
+import Json.Decode exposing (string)
 
 -- MODEL
 
 type Model 
     = LoadingPosts
-    | PostsLoaded (List Post)
+    | PostsLoaded (List PostPreview)
+    | Failure
 
-type alias Post = { title: String, date: Date, id: String }
+type alias PostPreview = { title: String, date: String, id: String }
 
 init: (Model, Cmd Msg)
 init = (LoadingPosts, httpFetchPosts) 
@@ -26,13 +33,16 @@ init = (LoadingPosts, httpFetchPosts)
 
 type Msg = 
     FetchPosts
-    | PostsRetrieved (List Post)
+    | PostsRetrieved (Result Http.Error (List PostPreview))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg _ = 
     case msg of
         FetchPosts -> (LoadingPosts, httpFetchPosts)
-        PostsRetrieved list -> (PostsLoaded list, Cmd.none)
+        PostsRetrieved result ->
+            case result of
+                Ok posts -> (PostsLoaded posts, Cmd.none)
+                _ -> (Failure, Cmd.none)
 
 -- VIEW
 
@@ -46,27 +56,35 @@ renderPostsSection model =
     case model of
         PostsLoaded posts -> ol [] (List.map renderPost posts)
         LoadingPosts -> span [] [text "LoadingPosts"]
+        Failure -> span [] [text "Error"]
 
-renderPost : Post -> Html msg
+renderPost : PostPreview -> Html msg
 renderPost post = 
     let
         path = Route.pathOf (Route.BlogPost post.id)
     in
     li [] [
         a [css [marginRight (px 40)], href path] [text post.title] ,
-        span [] [text (toIsoString post.date)]
+        span [] [text post.date]
     ]
 
 -- HTTP
 
 httpFetchPosts: Cmd Msg
 httpFetchPosts =
-    let
-        task = Process.sleep 100
-        msg = (PostsRetrieved testHomeModel)
-    in
-    task
-        |> Task.perform (\_ -> msg)
+    Http.get
+    { url = Debug.log "test" ("http://localhost:3000/postList")
+    , expect = Http.expectJson PostsRetrieved (list postDecoder)
+    }
 
-testHomeModel : List Post
-testHomeModel =  [{title = "test_1", date = fromCalendarDate 2021 Jan 1, id = "kjnhdf19084"}]
+
+postDecoder : Decoder PostPreview
+postDecoder = 
+    map3 PostPreview
+    (field "title" string)
+    (field "date" string)
+    (field "id" string)
+
+
+testHomeModel : List PostPreview
+testHomeModel =  [{title = "test_1", date = "test date", id = "kjnhdf19084"}]
