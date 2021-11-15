@@ -4,7 +4,7 @@ const mockData: {[id: string]: PostObj} = {
     "id_001": {
         title: "title_001",
         date: "01/01/2001",
-        body: "When Teddy was a little kid, he had a blue bicycle. One day he was riding it around a corner when some dudes just picked him up, threw him in a bush, and took it. \n" +
+        body: "When *Teddy* was a little kid, he had a blue _bicycle_. One day he was riding it around a corner when some dudes just picked him up, threw him in a bush, and took it. \n" +
         "His mom kinda freaked out."
     },
     "id_002": {
@@ -21,6 +21,13 @@ const mockData: {[id: string]: PostObj} = {
         title: "title_004 ",
         date: "04/04/2004",
         body: "Pee pee wee wee doo doo."
+    },
+    "id_005": {
+        title: "Testing Markdown",
+        date: "11/15/2021",
+        body: "# Heading 1 \n ## Heading 2 \n ### Heading 3 \n ![alt text](https://f4.bcbits.com/img/a2332018473_3.jpg)" 
+        + "\n\n[more info on markdown](https://package.elm-lang.org/packages/pablohirafuji/elm-markdown/latest/)"
+        + "\n\n ```elm\nrenderBody : String -> UnstyledHtml.Html msg\n```"
     }
 }
 

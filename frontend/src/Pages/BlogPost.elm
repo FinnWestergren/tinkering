@@ -1,5 +1,6 @@
 module Pages.BlogPost exposing (Model, init, update, view, Msg)
 import Date exposing (Date)
+import Html as UnstyledHtml exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
 import Css exposing (marginRight)
@@ -14,6 +15,7 @@ import Css exposing (marginTop)
 import Css exposing (marginLeft)
 import Css exposing (display)
 import Css exposing (inlineBlock)
+import Markdown
 
 -- MODEL
 
@@ -42,26 +44,31 @@ update msg _ =
 
 -- VIEW
 
-view : Model -> Html msg
-view model = div [] [
+view : Model -> Html.Styled.Html msg
+view model = Html.Styled.div [] [
         renderPostsSection model
     ]
 
-renderPostsSection: Model -> Html msg
+renderPostsSection: Model -> Html.Styled.Html msg
 renderPostsSection model =
     case model of
         Loaded post -> renderPost post
-        Loading -> span [] [text "Loading"]
-        Failure -> span [] [text "Error"]
+        Loading -> Html.Styled.span [] [Html.Styled.text "Loading"]
+        Failure -> Html.Styled.span [] [Html.Styled.text "Error"]
 
-renderPost : Post -> Html msg
+renderPost : Post -> Html.Styled.Html msg
 renderPost post = 
-    div [css [marginLeft (px 20)]] [
-        span [css [marginRight (px 40)]] [h3 [css [display inlineBlock]] [text post.title]] ,
-        span [css [marginRight (px 40)]] [h4 [css [display inlineBlock]] [text post.date]],
-        pre [] [text post.body]
+    Html.Styled.div [css [marginLeft (px 20)]] [
+        Html.Styled.span [css [marginRight (px 40)]] [Html.Styled.h3 [css [display inlineBlock]] [Html.Styled.text post.title]] ,
+        Html.Styled.span [css [marginRight (px 40)]] [Html.Styled.h4 [css [display inlineBlock]] [Html.Styled.text post.date]],
+        Html.Styled.fromUnstyled <| renderBody post.body
     ]
 
+
+renderBody : String -> UnstyledHtml.Html msg
+renderBody body = 
+    UnstyledHtml.div []
+        <| Markdown.toHtml Nothing body
 -- HTTP
 
 httpFetchPost : String -> Cmd Msg
