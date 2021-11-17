@@ -1,20 +1,8 @@
 module Pages.BlogPost exposing (Model, init, update, view, Msg)
-import Date exposing (Date)
-import Html as UnstyledHtml exposing (..)
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (css)
-import Css exposing (marginRight)
-import Css exposing (px)
-import Date exposing (toIsoString)
-import Date exposing (fromCalendarDate)
+import Html exposing (..)
 import Time exposing (Month(..))
 import Http
 import Json.Decode exposing (..)
-import Svg.Styled.Attributes exposing (result)
-import Css exposing (marginTop)
-import Css exposing (marginLeft)
-import Css exposing (display)
-import Css exposing (inlineBlock)
 import Markdown
 
 -- MODEL
@@ -44,30 +32,30 @@ update msg _ =
 
 -- VIEW
 
-view : Model -> Html.Styled.Html msg
-view model = Html.Styled.div [] [
-        renderPostsSection model
+view : Model -> Html msg
+view model = Html.div [] [
+        (renderPostsSection model)
     ]
 
-renderPostsSection: Model -> Html.Styled.Html msg
+renderPostsSection: Model -> Html msg
 renderPostsSection model =
     case model of
         Loaded post -> renderPost post
-        Loading -> Html.Styled.span [] [Html.Styled.text "Loading"]
-        Failure -> Html.Styled.span [] [Html.Styled.text "Error"]
+        Loading -> span [] [text "Loading"]
+        Failure -> span [] [text "Error"]
 
-renderPost : Post -> Html.Styled.Html msg
+renderPost : Post -> Html msg
 renderPost post = 
-    Html.Styled.div [css [marginLeft (px 20)]] [
-        Html.Styled.span [css [marginRight (px 40)]] [Html.Styled.h3 [css [display inlineBlock]] [Html.Styled.text post.title]] ,
-        Html.Styled.span [css [marginRight (px 40)]] [Html.Styled.h4 [css [display inlineBlock]] [Html.Styled.text post.date]],
-        Html.Styled.fromUnstyled <| renderBody post.body
+    div [] [
+        span [] [h3 [] [text post.title]],
+        span [] [h4 [] [text post.date]],
+        renderBody post.body
     ]
 
 
-renderBody : String -> UnstyledHtml.Html msg
+renderBody : String -> Html msg
 renderBody body = 
-    UnstyledHtml.div []
+    div []
         <| Markdown.toHtml Nothing body
 -- HTTP
 

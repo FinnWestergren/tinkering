@@ -1,13 +1,13 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
-import Url
-import Route exposing (Route)
-import Pages.Home as Homepage exposing (Model)
+import Html exposing (..)
+import Html.Attributes exposing (href)
 import Pages.BlogPost as BlogPost exposing (Model)
+import Pages.Home as Homepage exposing (Model)
+import Route exposing (Route)
+import Url
 
 -- MAIN
 
@@ -116,7 +116,7 @@ subscriptions _ =
 view : Model -> Browser.Document msg
 view model =
   { title = "Fuck my ass"
-  , body = [toUnstyled (renderBody model)]
+  , body = [renderBody model]
   }
 
 renderBody : Model -> Html msg

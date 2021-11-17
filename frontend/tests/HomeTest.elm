@@ -1,17 +1,12 @@
 module HomeTest exposing (suite)
 
 import Expect
+import Html exposing (..)
 import Fuzz exposing (intRange)
 import Test exposing (..)
 import Pages.Home as Home
-import Html.Styled exposing (..)
-import Date exposing (Interval(..), Unit(..), toIsoString, fromCalendarDate)
-import Time exposing (Month(..), Weekday(..))
 import List exposing (repeat)
-import Html.Styled.Attributes exposing (href)
-import Html.Styled.Attributes exposing (css)
-import Css exposing (marginRight)
-import Css exposing (px)
+import Html.Attributes exposing (href)
 
 suite : Test
 suite =
@@ -20,12 +15,12 @@ suite =
             \num -> 
                 let
                     title = (String.fromInt num) ++ "test"
-                    date = fromCalendarDate num Sep 26
+                    date = "Sep 26"
                     id = String.fromInt (num * num)
                     post = {title = title, date = date, id = id}
                     expected = li [] [
-                        a [css [marginRight (px 40)], href ("Post/" ++ id)] [text title],
-                        span [] [text (toIsoString date)]]
+                        a [href ("Post/" ++ id)] [text title],
+                        span [] [text date]]
                 in
                 Home.renderPost post
                 |> Expect.equal expected,
@@ -33,7 +28,7 @@ suite =
             \num -> 
                 let
                     title = "test"
-                    date = fromCalendarDate 2020 Oct 26
+                    date = "2020 Oct 26"
                     post = {title = title, date = date, id = String.fromInt (num * num)}
                     posts = post |> repeat num
                     multi = post |> Home.renderPost |> repeat num 
