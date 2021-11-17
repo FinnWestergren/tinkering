@@ -1,0 +1,17 @@
+{
+    "folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"*/static": true,
+			"*/node_modules": true,
+			"*/elm-stuff": true,
+			".git*": true,
+			"*/package-lock.json": true,
+			"*/babel.*": true
+		}
+	}
+}

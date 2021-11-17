@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { ErrorNames, NotFoundError, ServerError } from './CustomErrors';
+import { ErrorNames, NotFoundError, ServerError } from './customError';
 import * as Presentation from './presentation';
 
 const hostname = '127.0.0.1';
