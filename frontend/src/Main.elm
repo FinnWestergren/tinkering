@@ -121,14 +121,12 @@ view model =
 
 renderBody : Model -> Html msg
 renderBody model = 
-        div[] [
-            ul [] [ 
-                viewLink Route.Home 
-                ]
-            , renderCurrentPage model
-        ]
+    div[] [
+        i [] [viewLink Route.Home]
+        , renderCurrentPage model
+    ]
 
-viewLink : Route.Route  -> Html msg
+viewLink : Route.Route -> Html msg
 viewLink route  =
   let
     label = Route.labelOf route

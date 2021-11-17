@@ -5,8 +5,15 @@ import * as Presentation from './presentation';
 const hostname = '127.0.0.1';
 const port = 3000;
 
-type Request = { url: string; }
-type Response = { setHeader: (arg0: string, arg1: string) => void; statusCode: number; end: (arg0?: string) => void; }
+type Request = { 
+    url: string; 
+    method: string;
+}
+
+type Response = { 
+    setHeader: (arg0: string, arg1: string) => void; 
+    statusCode: number; end: (arg0?: string) => void; 
+}
 
 const route: (url: string) => string = (url) => {
     var urlSplit = url.toLowerCase().split('/');
@@ -22,8 +29,13 @@ const route: (url: string) => string = (url) => {
 }
 
 const server = createServer((req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'text/json');
     res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader('Content-Type', 'text/json');
+    if (req.method !== 'GET') {
+        res.statusCode = 501;
+        res.setHeader('Content-Type', 'text/plain');
+        return res.end('Method not implemented');
+    }
     try {
         const result = route(req.url);
         res.statusCode = 200;
