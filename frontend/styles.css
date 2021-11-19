@@ -1,0 +1,28 @@
+body {
+    background-color: blanchedalmond;
+}
+
+.post-li {
+    display: grid;
+    grid-template-columns: 10% 30% auto;
+}
+
+.post-li > .img-prefix {
+    grid-column: 1;
+    justify-self: right;
+    margin-right: 20px;
+}
+
+
+.post-li > * {
+    vertical-align: middle;
+}
+
+.post-li > a {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.post-li > span {
+    grid-column: 3;
+}

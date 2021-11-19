@@ -7,6 +7,7 @@ import List
 import Route
 import Url exposing (Protocol(..))
 import Html.Attributes exposing (src)
+import Html.Attributes exposing (class)
 
 -- MODEL
 
@@ -43,7 +44,7 @@ view model serverAddress = div [] [
 renderPostsSection: Model -> String -> Html msg
 renderPostsSection model serverAddress =
     case model of
-        PostsLoaded posts -> ol [] (List.indexedMap (\i p -> renderPost p serverAddress (i + 1)) posts)
+        PostsLoaded posts -> div [class "post-list"] (List.indexedMap (\i p -> renderPost p serverAddress (i + 1)) posts)
         LoadingPosts -> span [] [text "LoadingPosts"]
         Failure -> span [] [text "Error"]
 
@@ -53,10 +54,11 @@ renderPost post serverAddress index =
         path = Route.pathOf (Route.BlogPost post.id)
         imgList = renderIndexImage serverAddress index
     in
-    div [] (List.append imgList [
+    div [class "post-li"] [
+        div [class "img-prefix"] imgList, 
         a [href path] [text post.title] ,
         span [] [text post.date]
-    ])
+    ]
 
 
 renderIndexImage : String -> Int -> List(Html msg)
