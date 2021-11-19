@@ -8,6 +8,8 @@ import Pages.BlogPost as BlogPost exposing (Model)
 import Pages.Home as Homepage exposing (Model)
 import Route exposing (Route)
 import Url
+import Html.Attributes exposing (src)
+import Html.Events exposing (onClick)
 
 -- MAIN
 
@@ -31,8 +33,8 @@ type alias Model = {
 
 type Page
   = Redirect
-  | Home Homepage.Model
-  | BlogPost String BlogPost.Model 
+  | Home Homepage.Model 
+  | BlogPost String BlogPost.Model
   | NotFound
 
 type alias Flags = { serverAddress: String }
@@ -61,12 +63,12 @@ changePageTo model route =
     Route.NotFound -> ( { model | page = NotFound }, Cmd.none )
     Route.Home -> 
         let
-            (homeModel, homeCmd) = Homepage.init
+            (homeModel, homeCmd) = Homepage.init model.config.serverAddress
         in
             ({ model | page = Home homeModel } , Cmd.map HomeMsg homeCmd )
     Route.BlogPost id -> 
         let
-            (postModel, postCmd) = BlogPost.init id
+            (postModel, postCmd) = BlogPost.init model.config.serverAddress id
         in
             ({ model | page = BlogPost id postModel } , Cmd.map BlogPostMsg postCmd )
 
@@ -122,28 +124,22 @@ view model =
 renderBody : Model -> Html msg
 renderBody model = 
     div[] [
-        i [] [viewLink Route.Home]
+        i [] [renderHomeButton model]
         , renderCurrentPage model
     ]
 
-viewLink : Route.Route -> Html msg
-viewLink route  =
+renderHomeButton : Model ->  Html msg
+renderHomeButton model =
   let
-    label = Route.labelOf route
-    path = "/" ++ (Route.pathOf route)
+    path = "/" ++ (Route.pathOf Route.Home)
+    source = model.config.serverAddress ++ "/img/home"
   in
-    li [] [ a [ href path ] [ text label ] ]
+    a [href path] [img [src source] []]
 
 renderCurrentPage: Model -> Html msg
 renderCurrentPage model = 
   case model.page of
-    Home homeModel -> Homepage.view homeModel
+    Home homeModel -> Homepage.view homeModel model.config.serverAddress
     BlogPost _ postModel -> BlogPost.view postModel
     _ -> div [] []
 
-routeFromCurrentPage: Model -> Route.Route
-routeFromCurrentPage model =
-  case model.page of
-    BlogPost id _ -> Route.BlogPost id
-    Home _ -> Route.Home
-    _ -> Route.NotFound

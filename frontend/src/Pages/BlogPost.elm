@@ -14,8 +14,8 @@ type Model
 
 type alias Post = { title: String, date: String, body: String }
 
-init: String -> (Model, Cmd Msg)
-init postId = (Loading, httpFetchPost postId) 
+init: String ->  String -> (Model, Cmd Msg)
+init serverAddress postId = (Loading, httpFetchPost serverAddress postId) 
 
 -- UPDATE
 
@@ -59,10 +59,10 @@ renderBody body =
         <| Markdown.toHtml Nothing body
 -- HTTP
 
-httpFetchPost : String -> Cmd Msg
-httpFetchPost id =
+httpFetchPost : String -> String -> Cmd Msg
+httpFetchPost serverAddress id =
     Http.get
-    { url = Debug.log "test" ("http://localhost:3000/Post/" ++ id)
+    { url = serverAddress ++ "/Post/" ++ id
     , expect = Http.expectJson PostRetrieved postDecoder
     }
 

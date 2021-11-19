@@ -1,47 +1,33 @@
-import { createServer } from 'http';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { ErrorNames, NotFoundError, ServerError } from './customError';
-import * as Presentation from './presentation';
+import * as PresentationService from './presentationService';
+import * as Path from 'path';
+import * as FileSystem from 'fs';
 
 const hostname = '127.0.0.1';
 const port = 3000;
 
-type Request = { 
-    url: string; 
-    method: string;
-}
+const POST_LIST = "postlist";
+const POST = "post";
+const IMAGE = "img";
 
-type Response = { 
-    setHeader: (arg0: string, arg1: string) => void; 
-    statusCode: number; end: (arg0?: string) => void; 
-}
+const imageBase = "image-sets";
 
-const route: (url: string) => string = (url) => {
-    var urlSplit = url.toLowerCase().split('/');
-    switch (urlSplit[1]) {
-        case "postlist":
-            return JSON.stringify(Presentation.getPostList());
-        case "post":
-        case "posts":
-            return JSON.stringify(Presentation.getPost(urlSplit[2]));
-        default:
-            throw new NotFoundError(url);
-    }
-}
-
-const server = createServer((req: Request, res: Response) => {
+const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader('Content-Type', 'text/json');
+    res.setHeader("Cache-Control", "public, max-age=31536000")
+    res.setHeader("Last-Modified", "Wed, 21 Oct 2015 07:28:00 GMT")
     if (req.method !== 'GET') {
         res.statusCode = 501;
         res.setHeader('Content-Type', 'text/plain');
         return res.end('Method not implemented');
     }
     try {
-        const result = route(req.url);
-        res.statusCode = 200;
-        res.end(result);
+        route(req.url, res);
     }
     catch (error) {
+        res.setHeader('Content-Type', 'text/json');
+        console.log(error.message + 'hi');
         handleError(error, res);
     }
 });
@@ -50,18 +36,56 @@ server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
 
-const handleError = (error: Error, res: Response) => {
+const route: (url: string, res: ServerResponse) => void = (url, res) => {
+    var urlSplit = url.toLowerCase().split('/');
+    var base = urlSplit[1];
+    switch (base) {
+        case POST_LIST:
+            stringRes(PresentationService.getPostList(), res);
+            return;
+        case POST:
+            var postId = urlSplit[2];
+            stringRes(PresentationService.getPost(postId), res);
+            return;
+        case IMAGE:
+            imgRes(url.replace(`/${base}/`, ''), res);
+            return;
+        default:
+            throw new NotFoundError();
+    }
+}
+
+
+const handleError = (error: Error, res: ServerResponse) => {
     console.error(error.message);
-    console.log(error.name);
     switch(error.name){
         case (ErrorNames.NotFound):
         case (ErrorNames.Server):
             break;
         default:
-            error = new ServerError("Unknown Error Occured");
+            error = new ServerError();
     }
-    console.log(error.name);
     res.statusCode = Number.parseInt(error.name.substring(0,3), 10);
     res.end(`{"error": "${error.message}"}`);
 }
 
+const stringRes = (json: Object, res: ServerResponse) => {
+    res.setHeader('Content-Type', 'text/json');
+    res.statusCode = 200;
+    res.end(JSON.stringify(json));
+}
+
+const imgRes = (request: string, res: ServerResponse) => {
+    const baseName = '\\' + Path.basename(__dirname);
+    const setName = 'shit-set';
+    const backDir = __dirname.replace(baseName, '');
+    const file = Path.join(backDir, imageBase, setName, request) + '.png';
+    const stream = FileSystem.createReadStream(file);
+    stream.on('open', () => {
+        res.setHeader('Content-Type', 'image/png');
+        stream.pipe(res)
+    });
+    stream.on('error', (err) => {
+        handleError(err, res);
+    });
+}

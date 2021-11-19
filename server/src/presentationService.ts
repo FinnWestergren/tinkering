@@ -1,3 +1,4 @@
+import { NotFoundError } from './customError';
 import mockData from './mockData';
 import { PostObj, PostObjPreview } from './types';
 
@@ -13,7 +14,7 @@ export const getPostList: () => PostObjPreview[] = () => {
 export const getPost: (id: string) => PostObj = (id) => {
     var data = getData();
     if(!data[id]){
-        throw new Error("500")
+        throw new NotFoundError("Could not find a post with that ID")
     }
     return data[id];
 }

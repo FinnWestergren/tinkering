@@ -6,29 +6,28 @@ import Json.Decode exposing (..)
 import List
 import Route
 import Url exposing (Protocol(..))
+import Html.Attributes exposing (src)
 
 -- MODEL
 
 type Model 
     = LoadingPosts
-    | PostsLoaded (List PostPreview)
+    | PostsLoaded (List PostListItem)
     | Failure
 
-type alias PostPreview = { title: String, date: String, id: String }
+type alias PostListItem = { title: String, date: String, id: String }
 
-init: (Model, Cmd Msg)
-init = (LoadingPosts, httpFetchPosts) 
+init: String -> (Model, Cmd Msg)
+init serverAddress = (LoadingPosts, httpFetchPosts serverAddress) 
 
 -- UPDATE
 
 type Msg = 
-    FetchPosts
-    | PostsRetrieved (Result Http.Error (List PostPreview))
+    PostsRetrieved (Result Http.Error (List PostListItem))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg _ = 
     case msg of
-        FetchPosts -> (LoadingPosts, httpFetchPosts)
         PostsRetrieved result ->
             case result of
                 Ok posts -> (PostsLoaded posts, Cmd.none)
@@ -36,41 +35,54 @@ update msg _ =
 
 -- VIEW
 
-view : Model -> Html msg
-view model = div [] [
-        renderPostsSection model
+view : Model -> String -> Html msg
+view model serverAddress = div [] [
+        renderPostsSection model serverAddress
     ]
 
-renderPostsSection: Model -> Html msg
-renderPostsSection model =
+renderPostsSection: Model -> String -> Html msg
+renderPostsSection model serverAddress =
     case model of
-        PostsLoaded posts -> ol [] (List.map renderPost posts)
+        PostsLoaded posts -> ol [] (List.indexedMap (\i p -> renderPost p serverAddress (i + 1)) posts)
         LoadingPosts -> span [] [text "LoadingPosts"]
         Failure -> span [] [text "Error"]
 
-renderPost : PostPreview -> Html msg
-renderPost post = 
+renderPost : PostListItem ->  String -> Int -> Html msg
+renderPost post serverAddress index = 
     let
         path = Route.pathOf (Route.BlogPost post.id)
+        imgList = renderIndexImage serverAddress index
     in
-    li [] [
+    div [] (List.append imgList [
         a [href path] [text post.title] ,
         span [] [text post.date]
-    ]
+    ])
 
+
+renderIndexImage : String -> Int -> List(Html msg)
+renderIndexImage serverAddress index =
+    let
+        imgsrc = serverAddress ++ "/img/numbers/" ++ String.fromInt (modBy 10 index)
+        image = img [src imgsrc] []
+
+        nextlist = if index >= 10 
+            then renderIndexImage serverAddress (index // 10) 
+            else []
+    in
+    List.append nextlist [image]
 -- HTTP
 
-httpFetchPosts: Cmd Msg
-httpFetchPosts =
+httpFetchPosts: String -> Cmd Msg
+httpFetchPosts serverAddress = 
     Http.get
-    { url = Debug.log "test" ("http://localhost:3000/postList")
+    { url = serverAddress ++ "/postList"
     , expect = Http.expectJson PostsRetrieved (list postDecoder)
     }
 
 
-postDecoder : Decoder PostPreview
+postDecoder : Decoder PostListItem
 postDecoder = 
-    map3 PostPreview
+    map3 PostListItem
     (field "title" string)
     (field "date" string)
     (field "id" string)

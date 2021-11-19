@@ -28,6 +28,41 @@ const mockData: {[id: string]: PostObj} = {
         body: "# Heading 1 \n ## Heading 2 \n ### Heading 3 \n ![alt text](https://f4.bcbits.com/img/a2332018473_3.jpg)" 
         + "\n\n[more info on markdown](https://package.elm-lang.org/packages/pablohirafuji/elm-markdown/latest/)"
         + "\n\n ```elm\nrenderBody : String -> UnstyledHtml.Html msg\n```"
+    },
+    "id_006": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_007": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_008": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_009": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_010": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_011": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
+    },
+    "id_012": {
+        title: "title_002",
+        date: "02/02/2002",
+        body: "When Misha was a little kid, he lived in a yuppy little town in southern Connecticut. He hated school there."
     }
 }
 
