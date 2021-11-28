@@ -8,6 +8,7 @@ import Route
 import Url exposing (Protocol(..))
 import Html.Attributes exposing (src)
 import Html.Attributes exposing (class)
+import Html.Attributes exposing (style)
 
 -- MODEL
 
@@ -53,8 +54,10 @@ renderPost post serverAddress index =
     let
         path = Route.pathOf (Route.BlogPost post.id)
         imgList = renderIndexImage serverAddress index
+        itemBackground = renderItemBackground serverAddress
     in
     div [class "post-li"] [
+        span [] [itemBackground],
         div [class "img-prefix"] imgList, 
         a [href path] [text post.title] ,
         span [] [text post.date]
@@ -72,6 +75,15 @@ renderIndexImage serverAddress index =
             else []
     in
     List.append nextlist [image]
+
+renderItemBackground : String -> Html msg
+renderItemBackground  serverAddress =
+    let
+        imgsrc = serverAddress ++ "/img/list-item-background"
+    in
+    img [src imgsrc] []
+
+
 -- HTTP
 
 httpFetchPosts: String -> Cmd Msg

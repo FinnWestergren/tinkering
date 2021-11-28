@@ -77,7 +77,7 @@ const stringRes = (json: Object, res: ServerResponse) => {
 
 const imgRes = (request: string, res: ServerResponse) => {
     const baseName = '\\' + Path.basename(__dirname);
-    const setName = 'shit-set';
+    const setName = 'zoo-tycoon';
     const backDir = __dirname.replace(baseName, '');
     const file = Path.join(backDir, imageBase, setName, request) + '.png';
     const stream = FileSystem.createReadStream(file);
