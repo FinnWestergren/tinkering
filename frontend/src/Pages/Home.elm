@@ -57,10 +57,10 @@ renderPost post serverAddress index =
         itemBackground = renderItemBackground serverAddress
     in
     div [class "post-li"] [
-        span [] [itemBackground],
+        span [class "item-background-wrapper"] [itemBackground],
         div [class "img-prefix"] imgList, 
         a [href path] [text post.title] ,
-        span [] [text post.date]
+        span [class "post-date"] [text post.date]
     ]
 
 

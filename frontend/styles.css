@@ -6,6 +6,7 @@ body {
 .post-li {
     display: grid;
     grid-template-columns: 10% 30% auto;
+    height: 45px;
 }
 
 .post-li > .img-prefix {
@@ -16,7 +17,7 @@ body {
 
 
 .post-li > * {
-    vertical-align: middle;
+    margin: auto;
 }
 
 .post-li > a {
@@ -24,6 +25,11 @@ body {
     justify-self: center;
 }
 
-.post-li > span {
+.post-li > .post-date {
     grid-column: 3;
+}
+
+.item-background-wrapper {
+    z-index: -1;
+    position: absolute;
 }
