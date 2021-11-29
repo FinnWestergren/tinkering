@@ -9,6 +9,7 @@ import Url exposing (Protocol(..))
 import Html.Attributes exposing (src)
 import Html.Attributes exposing (class)
 import Html.Attributes exposing (style)
+import Array
 
 -- MODEL
 
@@ -53,28 +54,49 @@ renderPost : PostListItem ->  String -> Int -> Html msg
 renderPost post serverAddress index = 
     let
         path = Route.pathOf (Route.BlogPost post.id)
-        imgList = renderIndexImage serverAddress index
         itemBackground = renderItemBackground serverAddress
+        dateImage = renderDateImage serverAddress post.date 
     in
     div [class "post-li"] [
+        span [class "post-date"] dateImage,
         span [class "item-background-wrapper"] [itemBackground],
-        div [class "img-prefix"] imgList, 
-        a [href path] [text post.title] ,
-        span [class "post-date"] [text post.date]
+        a [href path, class "item-title"] [text post.title]
     ]
 
 
-renderIndexImage : String -> Int -> List(Html msg)
-renderIndexImage serverAddress index =
+renderDateImage : String -> String -> List(Html msg) 
+
+renderDateImage serverAddress dateString =
     let
-        imgsrc = serverAddress ++ "/img/numbers/" ++ String.fromInt (modBy 10 index)
+        parts = Array.fromList <| String.split " " dateString
+        month = Maybe.withDefault "Jan" <| Array.get 0 parts
+        monthImage = renderMonthImage serverAddress month
+        day = Maybe.withDefault "1" <| Array.get 1 parts
+        dayImage = renderNumberImage serverAddress <| Maybe.withDefault 1 <| String.toInt day
+        year = Maybe.withDefault "2001" <| Array.get 2 parts
+        yearImage = renderNumberImage serverAddress <| Maybe.withDefault 1 <| String.toInt year
+    in
+    [span [style "margin-right" "5"][monthImage], span [style "margin-right" "5"] dayImage, span [] yearImage]
+
+
+renderNumberImage : String -> Int -> List(Html msg)
+renderNumberImage serverAddress value =
+    let
+        imgsrc = serverAddress ++ "/img/numbers/" ++ String.fromInt (modBy 10 value)
         image = img [src imgsrc] []
 
-        nextlist = if index >= 10 
-            then renderIndexImage serverAddress (index // 10) 
+        nextlist = if value >= 10 
+            then renderNumberImage serverAddress (value // 10) 
             else []
     in
     List.append nextlist [image]
+
+renderMonthImage : String -> String -> Html msg
+renderMonthImage serverAddress value =
+    let
+        imgsrc = serverAddress ++ "/img/months/" ++ value
+    in
+    img [src imgsrc] []
 
 renderItemBackground : String -> Html msg
 renderItemBackground  serverAddress =
